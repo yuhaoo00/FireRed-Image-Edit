@@ -5,7 +5,7 @@
     <a href="https://huggingface.co/FireRedTeam" target="_blank"><img alt="Hugging Face" src="https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-FireRedTeam-ffc107?color=ffc107&logoColor=white" style="display: inline-block;"/></a>
     <a href='https://github.com/FireRedTeam/FireRed-Image-Edit'><img src='https://img.shields.io/badge/GitHub-Code-black'></a>
     <a href='https://www.apache.org/licenses/LICENSE-2.0'><img src="https://img.shields.io/badge/license-Apache%202.0-blue" alt="License"></a>
-    <a href="https://arxiv.org/abs/xxxxx" target="_blank"><img src="https://img.shields.io/badge/Report-b5212f.svg?logo=arxiv"></a>
+    <a href="https://github.com/FireRedTeam/FireRed-Image-Edit/blob/main/assets/FireRed_Image_Edit_1_0_Techinical_Report.pdf" target="_blank"><img src="https://img.shields.io/badge/Report-b5212f.svg?logo=arxiv"></a>
   </p>
 <p align="center"> 
     🤗 <a href="https://huggingface.co/FireRedTeam/FireRed-Image-Edit-1.0">HuggingFace</a> |
@@ -20,6 +20,7 @@
 **FireRed-Image-Edit** is a general-purpose image editing model that delivers high-fidelity and consistent editing across a wide range of scenarios.
 
 ## ✨ Key Features
+- **Strong Editing Performance**: FireRed-Image-Edit delivers leading open-source results with accurate instruction following, high image quality, and consistent visual coherence.
 - **Text Style Preservation**: Maintains text styles with high fidelity, achieving performance comparable to closed-source solutions
 - **Photo Restoration**: High-quality old photo restoration and enhancement
 - **Multi-Image Editing**: Flexible editing of multiple images such as virtual try-on
@@ -86,41 +87,9 @@ Some real outputs produced by FireRed-Image-Edit across genearl editing.
 pip install git+https://github.com/huggingface/diffusers
 ```
 2. Use the following code snippets to generate or edit images.
-
-### FireRed-Image-Edit-1.0
-
-```python
-import os
-import torch
-from PIL import Image
-from diffusers import QwenImageEditPlusPipeline
-from io import BytesIO
-import requests
-
-pipeline = QwenImageEditPlusPipeline.from_pretrained("FireRedTeam/FireRed-Image-Edit-1.0", torch_dtype=torch.bfloat16)
-print("pipeline loaded")
-
-pipeline.to('cuda')
-pipeline.set_progress_bar_config(disable=None)
-image1 = Image.open("./assets/edit_example1.png").convert("RGB")
-prompt = "在书本封面Python的下方，添加一行英文文字2nd Edition"
-inputs = {
-    "image": [image1],
-    "prompt": prompt,
-    "generator": torch.manual_seed(0),
-    "true_cfg_scale": 4.0,
-    "negative_prompt": " ",
-    "num_inference_steps": 40,
-    "guidance_scale": 1.0,
-    "num_images_per_prompt": 1,
-}
-with torch.inference_mode():
-    output = pipeline(**inputs)
-    output_image = output.images[0]
-    output_image.save("output_edit.png")
-    print("image saved at", os.path.abspath("output_edit.png"))
 ```
-
+python inference.py
+```
 
 ## 📊 Benchmark
 To better validate the capabilities of our model, we propose a benchmark called REDEdit-Bench. Our main goal is to build more diverse scenarios and editing instructions that better align with human language, enabling a more comprehensive evaluation of current editing models. We collected over 3,000 images from the internet, and after careful expert-designed selection, we constructed 1,673 bilingual (Chinese–English) editing pairs across 15 categories.
@@ -129,74 +98,714 @@ To better validate the capabilities of our model, we propose a benchmark called 
 We provide the inference and evaluation code for REDEdit-Bench. Please refer to the [redbench_infer.py](./src/tools/redbench_infer.py) and [redbench_eval.py](./src/tools/redbench_eval.py) scripts in the `src/tools` directory for more details.
 
 ### Benchmark Distribution
-The REDEdit-Bench dataset is available at: [REDEdit-Bench Dataset](https://huggingface.co/datasets/FireRedTeam/REDEdit-Bench)
+The REDEdit-Bench dataset will be available soon.
 
 ## Results on ImgEdit
 
-| Model | Add | Adjust | Extract | Replace | Remove | Background | Style | Hybrid | Action | Overall ↑ |
-|-------|-----|--------|---------|---------|--------|------------|--------|--------|--------|-----------|
-| **🔹 Proprietary Models** | | | | | | | | | | |
-| Nano-Banana | **4.62** | 4.41 | 3.68 | 4.34 | 4.39 | **4.40** | 4.18 | **3.72** | **4.83** | 4.29 |
-| Seedream4.0 | 4.33 | 4.38 | **3.89** | 4.65 | 4.57 | 4.35 | 4.22 | 3.71 | 4.61 | 4.30 |
-| Seedream4.5 | _4.57_ | **4.65** | 2.97 | _4.66_ | 4.46 | 4.37 | _4.92_ | 3.71 | 4.56 | _4.32_ |
-| Nano-Banana-Pro | 4.44 | _4.62_ | 3.42 | 4.60 | _4.63_ | 4.32 | **4.97** | 3.64 | 4.69 | **4.37** |
-| **🔹 Open-source Models** | | | | | | | | | | |
-| FLUX.1 Kontext [Dev] | 3.99 | 3.88 | 2.19 | 4.27 | 3.13 | 3.98 | 4.51 | 3.23 | 4.18 | 3.71 |
-| Step1X-Edit-v1.2 | 3.91 | 4.04 | 2.68 | 4.48 | 4.26 | 3.90 | 4.82 | 3.23 | 4.22 | 3.95 |
-| Qwen-Image-Edit-2509 | 4.34 | 4.27 | 3.42 | 4.73 | 4.36 | 4.37 | 4.91 | 3.56 | 4.80 | 4.31 |
-| FLUX.2 [Dev] | 4.50 | 4.18 | 3.83 | 4.65 | 4.65 | 4.31 | 4.88 | 3.46 | 4.70 | 4.35 |
-| LongCat-Image-Edit | 4.44 | 4.53 | 3.83 | _4.80_ | 4.60 | 4.33 | _4.92_ | 3.75 | _4.82_ | 4.45 |
-| Qwen-Image-Edit-2511 | 4.54 | _4.57_ | _4.13_ | 4.70 | 4.46 | 4.36 | 4.89 | **4.16** | 4.81 | _4.51_ |
-| **FireRed-Image-Edit** | _4.55_ | **4.66** | **4.34** | 4.75 | _4.58_ | _4.45_ | **4.97** | _4.07_ | 4.71 | **4.56** |
+<table style="border-collapse:collapse; width:100%; font-family:system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; font-size:14px;">
+  <thead>
+    <tr>
+      <th style="border:1px solid #ddd; padding:8px; text-align:left;">Model</th>
+      <th style="border:1px solid #ddd; padding:8px; text-align:center;">Add</th>
+      <th style="border:1px solid #ddd; padding:8px; text-align:center;">Adjust</th>
+      <th style="border:1px solid #ddd; padding:8px; text-align:center;">Extract</th>
+      <th style="border:1px solid #ddd; padding:8px; text-align:center;">Replace</th>
+      <th style="border:1px solid #ddd; padding:8px; text-align:center;">Remove</th>
+      <th style="border:1px solid #ddd; padding:8px; text-align:center;">BG</th>
+      <th style="border:1px solid #ddd; padding:8px; text-align:center;">Style</th>
+      <th style="border:1px solid #ddd; padding:8px; text-align:center;">Hybrid</th>
+      <th style="border:1px solid #ddd; padding:8px; text-align:center;">Action</th>
+      <th style="border:1px solid #ddd; padding:8px; text-align:center;">Overall ↑</th>
+    </tr>
+  </thead>
+  <tbody>
+    <!-- Group: Proprietary Models -->
+    <tr>
+      <td colspan="11" style="border:1px solid #ddd; padding:8px; font-weight:700; background:#f7f7f7;">
+        🔹 Proprietary Models
+      </td>
+    </tr>
+    <tr>
+      <td style="border:1px solid #ddd; padding:8px; text-align:left;">Nano-Banana</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;"><b>4.62</b></td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">4.41</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">3.68</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">4.34</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">4.39</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;"><b>4.40</b></td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">4.18</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;"><b>3.72</b></td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;"><b>4.83</b></td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">4.29</td>
+    </tr>
+    <tr>
+      <td style="border:1px solid #ddd; padding:8px; text-align:left;">Seedream4.0</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">4.33</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">4.38</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;"><b>3.89</b></td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">4.65</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">4.57</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">4.35</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">4.22</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">3.71</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">4.61</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">4.30</td>
+    </tr>
+    <tr>
+      <td style="border:1px solid #ddd; padding:8px; text-align:left;">Seedream4.5</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;"><u>4.57</u></td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;"><b>4.65</b></td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">2.97</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;"><u>4.66</u></td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">4.46</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">4.37</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;"><u>4.92</u></td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">3.71</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">4.56</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;"><u>4.32</u></td>
+    </tr>
+    <tr>
+      <td style="border:1px solid #ddd; padding:8px; text-align:left;">Nano-Banana-Pro</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">4.44</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;"><u>4.62</u></td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">3.42</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">4.60</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;"><u>4.63</u></td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">4.32</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;"><b>4.97</b></td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">3.64</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">4.69</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;"><b>4.37</b></td>
+    </tr>
+    <!-- Group: Open-source Models -->
+    <tr>
+      <td colspan="11" style="border:1px solid #ddd; padding:8px; font-weight:700; background:#f7f7f7;" >
+        🔹 Open-source Models
+      </td>
+    </tr>
+    <tr>
+      <td style="border:1px solid #ddd; padding:8px; text-align:left;">FLUX.1 Kontext [Dev]</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">3.99</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">3.88</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">2.19</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">4.27</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">3.13</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">3.98</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">4.51</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">3.23</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">4.18</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">3.71</td>
+    </tr>
+    <tr>
+      <td style="border:1px solid #ddd; padding:8px; text-align:left;">Step1X-Edit-v1.2</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">3.91</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">4.04</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">2.68</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">4.48</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">4.26</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">3.90</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">4.82</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">3.23</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">4.22</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">3.95</td>
+    </tr>
+    <tr>
+      <td style="border:1px solid #ddd; padding:8px; text-align:left;">Qwen-Image-Edit-2509</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">4.34</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">4.27</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">3.42</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">4.73</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">4.36</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">4.37</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">4.91</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">3.56</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">4.80</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">4.31</td>
+    </tr>
+    <tr>
+      <td style="border:1px solid #ddd; padding:8px; text-align:left;">FLUX.2 [Dev]</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">4.50</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">4.18</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">3.83</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">4.65</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">4.65</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">4.31</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">4.88</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">3.46</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">4.70</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">4.35</td>
+    </tr>
+    <tr>
+      <td style="border:1px solid #ddd; padding:8px; text-align:left;">LongCat-Image-Edit</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">4.44</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">4.53</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">3.83</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;"><u>4.80</u></td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">4.60</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">4.33</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;"><u>4.92</u></td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">3.75</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;"><u>4.82</u></td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">4.45</td>
+    </tr>
+    <tr>
+      <td style="border:1px solid #ddd; padding:8px; text-align:left;">Qwen-Image-Edit-2511</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">4.54</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;"><u>4.57</u></td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;"><u>4.13</u></td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">4.70</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">4.46</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">4.36</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">4.89</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;"><b>4.16</b></td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">4.81</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;"><u>4.51</u></td>
+    </tr>
+    <tr>
+      <td style="border:1px solid #ddd; padding:8px; text-align:left;"><b>FireRed-Image-Edit</b></td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;"><u>4.55</u></td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;"><b>4.66</b></td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;"><b>4.34</b></td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">4.75</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;"><u>4.58</u></td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;"><u>4.45</u></td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;"><b>4.97</b></td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;"><u>4.07</u></td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;">4.71</td>
+      <td style="border:1px solid #ddd; padding:8px; text-align:center;"><b>4.56</b></td>
+    </tr>
+  </tbody>
+</table>
 
 ### Results on GEdit (official public benchmark)
 
-| Model | G_SC ↑ (EN) | G_PQ ↑ (EN) | G_O ↑ (EN) | G_SC ↑ (CN) | G_PQ ↑ (CN) | G_O ↑ (CN) |
-|-------|------------|------------|------------|------------|------------|------------|
-| **🔹 Proprietary Models** |||||||
-| Nano-Banana | 7.396 | **8.454** | 7.291 | 7.540 | **8.424** | 7.399 |
-| Seedream4.0 | _8.143_ | 8.124 | 7.701 | 8.159 | 8.074 | 7.692 |
-| Nano-Banana-Pro | 8.102 | _8.344_ | 7.738 | 8.135 | _8.306_ | 7.799 |
-| Seedream4.5 | **8.268** | 8.167 | **7.820** | **8.254** | 8.167 | **7.800** |
-| **🔹 Open-source Models** |||||||
-| FLUX.2 [Dev] | 7.835 | 8.064 | 7.413 | 7.697 | 8.046 | 7.278 |
-| Qwen-Image-Edit-2509 | 7.974 | 7.714 | 7.480 | 7.988 | 7.679 | 7.467 |
-| Step1X-Edit-v1.2 | 7.974 | 7.714 | 7.480 | 7.988 | 7.679 | 7.467 |
-| Longcat-Image-Edit | 8.128 | _8.177_ | 7.748 | 8.141 | 8.117 | 7.731 |
-| Qwen-Image-Edit-2511 | _8.297_ | 8.202 | _7.877_ | _8.252_ | 8.134 | _7.819_ |
-| **\methodname** | **8.363** | **8.245** | **7.943** | **8.287** | **8.227** | **7.887** |
+<div style="overflow-x: auto; margin-bottom: 16px;">
+  <table style="border-collapse: collapse; width: 100%;">
+    <thead>
+      <tr>
+        <th style="padding: 8px; border: 1px solid #d0d7de; background-color: #f6f8fa; white-space: nowrap;">Model</th>
+        <th style="padding: 8px; border: 1px solid #d0d7de; background-color: #f6f8fa; white-space: nowrap;">G_SC ↑ (EN)</th>
+        <th style="padding: 8px; border: 1px solid #d0d7de; background-color: #f6f8fa; white-space: nowrap;">G_PQ ↑ (EN)</th>
+        <th style="padding: 8px; border: 1px solid #d0d7de; background-color: #f6f8fa; white-space: nowrap;">G_O ↑ (EN)</th>
+        <th style="padding: 8px; border: 1px solid #d0d7de; background-color: #f6f8fa; white-space: nowrap;">G_SC ↑ (CN)</th>
+        <th style="padding: 8px; border: 1px solid #d0d7de; background-color: #f6f8fa; white-space: nowrap;">G_PQ ↑ (CN)</th>
+        <th style="padding: 8px; border: 1px solid #d0d7de; background-color: #f6f8fa; white-space: nowrap;">G_O ↑ (CN)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td colspan="7" style="padding: 8px; border: 1px solid #d0d7de; font-weight: 600; text-align: left;">🔹 Proprietary Models</td>
+      </tr>
+      <tr>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: left; white-space: nowrap;">Nano-Banana</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">7.396</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>8.454</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">7.291</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">7.540</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>8.424</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">7.399</td>
+      </tr>
+      <tr>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: left; white-space: nowrap;">Seedream4.0</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><u>8.143</u></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">8.124</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">7.701</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">8.159</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">8.074</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">7.692</td>
+      </tr>
+      <tr>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: left; white-space: nowrap;">Nano-Banana-Pro</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">8.102</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><u>8.344</u></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">7.738</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">8.135</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><u>8.306</u></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">7.799</td>
+      </tr>
+      <tr>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: left; white-space: nowrap;">Seedream4.5</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>8.268</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">8.167</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>7.820</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>8.254</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">8.167</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>7.800</strong></td>
+      </tr>
+      <tr>
+        <td colspan="7" style="padding: 8px; border: 1px solid #d0d7de; font-weight: 600; text-align: left;">🔹 Open-source Models</td>
+      </tr>
+      <tr>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: left; white-space: nowrap;">FLUX.2 [Dev]</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">7.835</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">8.064</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">7.413</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">7.697</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">8.046</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">7.278</td>
+      </tr>
+      <tr>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: left; white-space: nowrap;">Qwen-Image-Edit-2509</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">7.974</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">7.714</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">7.480</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">7.988</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">7.679</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">7.467</td>
+      </tr>
+      <tr>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: left; white-space: nowrap;">Step1X-Edit-v1.2</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">7.974</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">7.714</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">7.480</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">7.988</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">7.679</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">7.467</td>
+      </tr>
+      <tr>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: left; white-space: nowrap;">Longcat-Image-Edit</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">8.128</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><u>8.177</u></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">7.748</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">8.141</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">8.117</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">7.731</td>
+      </tr>
+      <tr>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: left; white-space: nowrap;">Qwen-Image-Edit-2511</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><u>8.297</u></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">8.202</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><u>7.877</u></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><u>8.252</u></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">8.134</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><u>7.819</u></td>
+      </tr>
+      <tr>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: left; white-space: nowrap;"><strong>\methodname</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>8.363</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>8.245</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>7.943</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>8.287</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>8.227</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>7.887</strong></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 
 ### Results on REDEdit-Bench-CN (General Dimensions)
 
-| Model | Overall | Add | Adjust | BG | Beauty | Color | Compose | Extract | Portrait | Low-level | Motion | Remove | Replace | Stylize | Text | Viewpoint |
-|-------|---------|-----|--------|----|--------|-------|---------|---------|----------|-----------|--------|--------|---------|---------|------|-----------|
-| **🔹 Proprietary Models** |||||||||||||||||||
-| Seedream4.0 | 4.15 | 4.55 | 4.11 | <u>4.61</u> | 3.83 | 4.14 | <u>4.16</u> | 2.48 | 4.77 | 4.17 | 4.68 | 4.02 | 4.53 | <u>4.94</u> | 3.94 | 3.29 |
-| Seedream4.5 | <u>4.18</u> | <u>4.58</u> | 4.09 | 4.57 | 3.97 | 4.12 | 4.05 | 2.56 | <u>4.80</u> | 3.99 | <u>4.78</u> | 4.12 | 4.53 | <u>4.94</u> | 4.07 | <u>3.53</u> |
-| Nano-Banana | 4.13 | **4.66** | 4.26 | **4.63** | **4.37** | 4.13 | 3.94 | 3.17 | 4.83 | 4.05 | 4.75 | 4.07 | 4.74 | 3.63 | 3.69 | 3.09 |
-| Nano-Banana-Pro | **4.48** | **4.66** | **4.41** | 4.58 | <u>4.35</u> | **4.58** | **4.36** | <u>3.42</u> | **4.86** | **4.46** | **4.91** | **4.54** | **4.79** | 4.85 | **4.69** | **3.75** |
-| **🔹 Open-source Models** |||||||||||||||||||
-| Qwen-Image-Edit-2509 | 4.00 | 4.45 | 4.04 | 4.48 | 3.36 | 4.20 | 3.92 | 2.64 | 4.16 | 3.52 | 4.66 | 4.27 | 4.66 | 4.81 | 3.53 | 3.32 |
-| FLUX.2 [Dev] | 4.05 | 4.31 | 3.88 | 4.57 | **3.80** | 3.91 | 3.85 | 2.47 | 4.50 | <u>4.43</u> | **4.68** | 3.50 | 4.47 | **4.95** | 3.53 | **3.88** |
-| Longcat-Image-Edit | 4.12 | 4.34 | 4.25 | 4.54 | <u>3.72</u> | 4.12 | 3.92 | 2.48 | 4.49 | 4.31 | 4.67 | 4.27 | 4.61 | <u>4.94</u> | 3.83 | 3.30 |
-| Qwen-Image-Edit-2511 | <u>4.18</u> | <u>4.50</u> | 4.23 | <u>4.52</u> | 3.61 | 4.09 | 4.00 | <u>3.22</u> | 4.31 | 4.19 | <u>4.66</u> | <u>4.41</u> | <u>4.68</u> | 4.83 | 4.08 | <u>3.51</u> |
-| **FireRed-Image-Edit** | **4.33** | **4.57** | **4.37** | **4.64** | 3.69 | **4.45** | **4.29** | **3.49** | **4.50** | **4.56** | 4.65 | **4.47** | **4.81** | 4.93 | **4.49** | 3.14 |
+<div style="overflow-x: auto; margin-bottom: 16px;">
+  <table style="border-collapse: collapse; width: 100%;">
+    <thead>
+      <tr>
+        <th style="padding: 8px; border: 1px solid #d0d7de; background-color: #f6f8fa; white-space: nowrap;">Model</th>
+        <th style="padding: 8px; border: 1px solid #d0d7de; background-color: #f6f8fa; white-space: nowrap;">Overall</th>
+        <th style="padding: 8px; border: 1px solid #d0d7de; background-color: #f6f8fa; white-space: nowrap;">Add</th>
+        <th style="padding: 8px; border: 1px solid #d0d7de; background-color: #f6f8fa; white-space: nowrap;">Adjust</th>
+        <th style="padding: 8px; border: 1px solid #d0d7de; background-color: #f6f8fa; white-space: nowrap;">BG</th>
+        <th style="padding: 8px; border: 1px solid #d0d7de; background-color: #f6f8fa; white-space: nowrap;">Beauty</th>
+        <th style="padding: 8px; border: 1px solid #d0d7de; background-color: #f6f8fa; white-space: nowrap;">Color</th>
+        <th style="padding: 8px; border: 1px solid #d0d7de; background-color: #f6f8fa; white-space: nowrap;">Compose</th>
+        <th style="padding: 8px; border: 1px solid #d0d7de; background-color: #f6f8fa; white-space: nowrap;">Extract</th>
+        <th style="padding: 8px; border: 1px solid #d0d7de; background-color: #f6f8fa; white-space: nowrap;">Portrait</th>
+        <th style="padding: 8px; border: 1px solid #d0d7de; background-color: #f6f8fa; white-space: nowrap;">Low-level</th>
+        <th style="padding: 8px; border: 1px solid #d0d7de; background-color: #f6f8fa; white-space: nowrap;">Motion</th>
+        <th style="padding: 8px; border: 1px solid #d0d7de; background-color: #f6f8fa; white-space: nowrap;">Remove</th>
+        <th style="padding: 8px; border: 1px solid #d0d7de; background-color: #f6f8fa; white-space: nowrap;">Replace</th>
+        <th style="padding: 8px; border: 1px solid #d0d7de; background-color: #f6f8fa; white-space: nowrap;">Stylize</th>
+        <th style="padding: 8px; border: 1px solid #d0d7de; background-color: #f6f8fa; white-space: nowrap;">Text</th>
+        <th style="padding: 8px; border: 1px solid #d0d7de; background-color: #f6f8fa; white-space: nowrap;">Viewpoint</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td colspan="17" style="padding: 8px; border: 1px solid #d0d7de; font-weight: 600; text-align: left;">🔹 Proprietary Models</td>
+      </tr>
+      <tr>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: left; white-space: nowrap;">Seedream4.0</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.15</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.55</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.11</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><u>4.61</u></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">3.83</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.14</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><u>4.16</u></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">2.48</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.77</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.17</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.68</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.02</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.53</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><u>4.94</u></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">3.94</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">3.29</td>
+      </tr>
+      <tr>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: left; white-space: nowrap;">Seedream4.5</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><u>4.18</u></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><u>4.58</u></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.09</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.57</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">3.97</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.12</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.05</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">2.56</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><u>4.80</u></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">3.99</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><u>4.78</u></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.12</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.53</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><u>4.94</u></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.07</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><u>3.53</u></td>
+      </tr>
+      <tr>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: left; white-space: nowrap;">Nano-Banana</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.13</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>4.66</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.26</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>4.63</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>4.37</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.13</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">3.94</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">3.17</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.83</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.05</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.75</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.07</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.74</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">3.63</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">3.69</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">3.09</td>
+      </tr>
+      <tr>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: left; white-space: nowrap;">Nano-Banana-Pro</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>4.48</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>4.66</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>4.41</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.58</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><u>4.35</u></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>4.58</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>4.36</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><u>3.42</u></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>4.86</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>4.46</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>4.91</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>4.54</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>4.79</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.85</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>4.69</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>3.75</strong></td>
+      </tr>
+      <tr>
+        <td colspan="17" style="padding: 8px; border: 1px solid #d0d7de; font-weight: 600; text-align: left;">🔹 Open-source Models</td>
+      </tr>
+      <tr>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: left; white-space: nowrap;">Qwen-Image-Edit-2509</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.00</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.45</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.04</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.48</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">3.36</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.20</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">3.92</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">2.64</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.16</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">3.52</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.66</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.27</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.66</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.81</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">3.53</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">3.32</td>
+      </tr>
+      <tr>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: left; white-space: nowrap;">FLUX.2 [Dev]</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.05</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.31</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">3.88</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.57</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>3.80</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">3.91</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">3.85</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">2.47</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.50</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><u>4.43</u></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>4.68</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">3.50</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.47</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>4.95</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">3.53</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>3.88</strong></td>
+      </tr>
+      <tr>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: left; white-space: nowrap;">Longcat-Image-Edit</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.12</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.34</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.25</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.54</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><u>3.72</u></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.12</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">3.92</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">2.48</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.49</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.31</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.67</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.27</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.61</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><u>4.94</u></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">3.83</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">3.30</td>
+      </tr>
+      <tr>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: left; white-space: nowrap;">Qwen-Image-Edit-2511</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><u>4.18</u></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><u>4.50</u></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.23</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><u>4.52</u></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">3.61</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.09</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.00</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><u>3.22</u></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.31</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.19</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><u>4.66</u></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><u>4.41</u></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><u>4.68</u></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.83</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.08</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><u>3.51</u></td>
+      </tr>
+      <tr>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: left; white-space: nowrap;"><strong>FireRed-Image-Edit</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>4.33</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>4.57</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>4.37</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>4.64</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">3.69</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>4.45</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>4.29</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>3.49</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>4.50</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>4.56</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.65</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>4.47</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>4.81</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.93</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>4.49</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">3.14</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 
 ### Results on REDEdit-Bench-EN (General dimensions)
 
-| Model | Overall | Add | Adjust | BG | Beauty | Color | Compose | Extract | Portrait | Low-level | Motion | Remove | Replace | Stylize | Text | Viewpoint |
-|--------|---------|------|---------|------|---------|--------|----------|----------|-----------|-------------|---------|----------|----------|----------|--------|------------|
-| **🔹 Proprietary Models** |||||||||||||||||||
-| Nano-Banana | 4.15 | 4.65 | 4.23 | 4.60 | **4.37** | 4.08 | 3.98 | **3.39** | 4.72 | 4.03 | 4.63 | 4.07 | 4.68 | 3.68 | 3.87 | 3.23 |
-| Seedream4.0 | 4.18 | <u>4.59</u> | 4.12 | <u>4.63</u> | <u>3.89</u> | 4.10 | <u>4.14</u> | 2.28 | <u>4.77</u> | 4.12 | <u>4.73</u> | 4.23 | 4.56 | **4.98** | 4.21 | 3.42 |
-| Seedream4.5 | <u>4.20</u> | 4.66 | 4.08 | 4.64 | 4.12 | 4.07 | 4.10 | 2.23 | 4.74 | <u>4.28</u> | 4.75 | 4.24 | 4.58 | <u>4.97</u> | 4.20 | 3.44 |
-| Nano-Banana-Pro | **4.42** | **4.72** | **4.40** | **4.64** | **4.37** | **4.43** | **4.32** | <u>3.25</u> | **4.82** | **4.36** | **4.85** | **4.52** | **4.75** | 4.90 | **4.54** | **3.51** |
-| **🔹 Open-source Models** |||||||||||||||||||
-| Qwen-Image-Edit-2509 | 3.99 | 4.47 | 4.06 | 4.49 | 3.13 | 3.98 | 3.85 | 2.91 | 4.30 | 3.71 | 4.58 | 4.40 | <u>4.67</u> | 4.77 | 3.77 | 2.85 |
-| FLUX.2 [Dev] | 4.07 | 4.37 | 3.96 | 4.47 | 3.72 | 3.86 | 3.87 | 2.36 | 4.44 | <u>4.45</u> | 4.67 | 4.02 | 4.48 | <u>4.87</u> | 3.80 | **3.84** |
-| LongCat-Image-Edit | 4.12 | 4.38 | 4.04 | 4.49 | <u>3.89</u> | 4.10 | 3.93 | 2.98 | 4.47 | 4.27 | 4.69 | 4.24 | 4.51 | 4.86 | 3.83 | 3.25 |
-| Qwen-Image-Edit-2511 | <u>4.23</u> | <u>4.55</u> | 4.17 | <u>4.56</u> | 3.49 | 4.07 | 4.07 | <u>3.54</u> | 4.42 | **4.52** | <u>4.72</u> | 4.42 | 4.65 | 4.85 | 4.06 | 3.38 |
-| **\methodname** | **4.26** | **4.41** | **4.33** | **4.60** | **3.55** | **4.47** | **4.25** | **3.49** | **4.50** | 4.44 | **4.65** | **4.46** | **4.70** | **4.94** | **4.44** | 2.78 |
+<div style="overflow-x: auto; margin-bottom: 16px;">
+  <table style="border-collapse: collapse; width: 100%;">
+    <thead>
+      <tr>
+        <th style="padding: 8px; border: 1px solid #d0d7de; background-color: #f6f8fa; white-space: nowrap;">Model</th>
+        <th style="padding: 8px; border: 1px solid #d0d7de; background-color: #f6f8fa; white-space: nowrap;">Overall</th>
+        <th style="padding: 8px; border: 1px solid #d0d7de; background-color: #f6f8fa; white-space: nowrap;">Add</th>
+        <th style="padding: 8px; border: 1px solid #d0d7de; background-color: #f6f8fa; white-space: nowrap;">Adjust</th>
+        <th style="padding: 8px; border: 1px solid #d0d7de; background-color: #f6f8fa; white-space: nowrap;">BG</th>
+        <th style="padding: 8px; border: 1px solid #d0d7de; background-color: #f6f8fa; white-space: nowrap;">Beauty</th>
+        <th style="padding: 8px; border: 1px solid #d0d7de; background-color: #f6f8fa; white-space: nowrap;">Color</th>
+        <th style="padding: 8px; border: 1px solid #d0d7de; background-color: #f6f8fa; white-space: nowrap;">Compose</th>
+        <th style="padding: 8px; border: 1px solid #d0d7de; background-color: #f6f8fa; white-space: nowrap;">Extract</th>
+        <th style="padding: 8px; border: 1px solid #d0d7de; background-color: #f6f8fa; white-space: nowrap;">Portrait</th>
+        <th style="padding: 8px; border: 1px solid #d0d7de; background-color: #f6f8fa; white-space: nowrap;">Low-level</th>
+        <th style="padding: 8px; border: 1px solid #d0d7de; background-color: #f6f8fa; white-space: nowrap;">Motion</th>
+        <th style="padding: 8px; border: 1px solid #d0d7de; background-color: #f6f8fa; white-space: nowrap;">Remove</th>
+        <th style="padding: 8px; border: 1px solid #d0d7de; background-color: #f6f8fa; white-space: nowrap;">Replace</th>
+        <th style="padding: 8px; border: 1px solid #d0d7de; background-color: #f6f8fa; white-space: nowrap;">Stylize</th>
+        <th style="padding: 8px; border: 1px solid #d0d7de; background-color: #f6f8fa; white-space: nowrap;">Text</th>
+        <th style="padding: 8px; border: 1px solid #d0d7de; background-color: #f6f8fa; white-space: nowrap;">Viewpoint</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td colspan="17" style="padding: 8px; border: 1px solid #d0d7de; font-weight: 600; text-align: left;">🔹 Proprietary Models</td>
+      </tr>
+      <tr>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: left; white-space: nowrap;">Nano-Banana</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.15</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.65</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.23</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.60</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>4.37</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.08</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">3.98</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>3.39</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.72</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.03</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.63</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.07</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.68</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">3.68</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">3.87</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">3.23</td>
+      </tr>
+      <tr>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: left; white-space: nowrap;">Seedream4.0</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.18</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><u>4.59</u></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.12</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><u>4.63</u></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><u>3.89</u></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.10</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><u>4.14</u></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">2.28</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><u>4.77</u></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.12</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><u>4.73</u></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.23</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.56</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>4.98</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.21</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">3.42</td>
+      </tr>
+      <tr>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: left; white-space: nowrap;">Seedream4.5</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><u>4.20</u></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.66</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.08</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.64</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.12</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.07</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.10</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">2.23</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.74</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><u>4.28</u></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.75</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.24</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.58</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><u>4.97</u></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.20</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">3.44</td>
+      </tr>
+      <tr>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: left; white-space: nowrap;">Nano-Banana-Pro</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>4.42</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>4.72</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>4.40</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>4.64</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>4.37</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>4.43</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>4.32</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><u>3.25</u></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>4.82</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>4.36</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>4.85</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>4.52</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>4.75</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.90</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>4.54</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>3.51</strong></td>
+      </tr>
+      <tr>
+        <td colspan="17" style="padding: 8px; border: 1px solid #d0d7de; font-weight: 600; text-align: left;">🔹 Open-source Models</td>
+      </tr>
+      <tr>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: left; white-space: nowrap;">Qwen-Image-Edit-2509</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">3.99</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.47</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.06</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.49</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">3.13</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">3.98</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">3.85</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">2.91</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.30</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">3.71</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.58</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.40</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><u>4.67</u></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.77</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">3.77</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">2.85</td>
+      </tr>
+      <tr>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: left; white-space: nowrap;">FLUX.2 [Dev]</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.07</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.37</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">3.96</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.47</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">3.72</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">3.86</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">3.87</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">2.36</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.44</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><u>4.45</u></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.67</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.02</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.48</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><u>4.87</u></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">3.80</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>3.84</strong></td>
+      </tr>
+      <tr>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: left; white-space: nowrap;">LongCat-Image-Edit</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.12</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.38</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.04</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.49</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><u>3.89</u></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.10</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">3.93</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">2.98</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.47</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.27</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.69</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.24</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.51</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.86</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">3.83</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">3.25</td>
+      </tr>
+      <tr>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: left; white-space: nowrap;">Qwen-Image-Edit-2511</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><u>4.23</u></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><u>4.55</u></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.17</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><u>4.56</u></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">3.49</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.07</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.07</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><u>3.54</u></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.42</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>4.52</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><u>4.72</u></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.42</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.65</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.85</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.06</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">3.38</td>
+      </tr>
+      <tr>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: left; white-space: nowrap;"><strong>FireRed-Image-Edit</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>4.26</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>4.41</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>4.33</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>4.60</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>3.55</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>4.47</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>4.25</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>3.49</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>4.50</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">4.44</td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>4.65</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>4.46</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>4.70</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>4.94</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>4.44</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;">2.78</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 
 ## 📜 License Agreement
 
@@ -215,7 +824,7 @@ The code and the weights of FireRed-Image-Edit are licensed under Apache 2.0.
 We kindly encourage citation of our work if you find it useful.
 
 ```bibtex
-@article{firered2026,
+@article{firered2026rededit,
       title={FireRed-Image-Edit: A General-Purpose Image Editing Model}, 
       author={Changhao Qiao and Chao Hui and Chen Li and Cunzheng Wang and Dejia Song and Jiale Zhang and Jing Li and Qiang Xiang and Runqi Wang and Shuang Sun and Wei Zhu and Xu Tang and Yao Hu and Yibo Chen and Haohua Chen and Haolu Liu and Honghao Cai and Shurui Shi and Shuyang Lin and Sijie Xu and Tianshuo Yuan and Tianze Zhou and Wenxin Yu and Xiangyuan Wang and Xudong Zhou and Yahui Wang and Yandong Guan and Yanqin Chen and Yilian Zhong and Ying Li and Yunhao Bai and Yushun Fang and Zeming Liu and Zhangyu Lai and Zhiqiang Wu},
       year={2026},
@@ -236,9 +845,6 @@ FireRed-Image-Edit  has not been specifically designed or comprehensively evalua
 ## 🤝 Acknowledgements
 
 We would like to thank the developers of the amazing open-source projects, including [Qwen-Image](https://github.com/QwenLM/Qwen-Image), [Diffusers](https://github.com/huggingface/diffusers) and [HuggingFace](https://huggingface.co)
-
-
-
 
 
 
