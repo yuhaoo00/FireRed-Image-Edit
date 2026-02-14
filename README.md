@@ -799,6 +799,6 @@ FireRed-Image-Edit  has not been specifically designed or comprehensively evalua
 
 We would like to thank the developers of the amazing open-source projects, including [Qwen-Image](https://github.com/QwenLM/Qwen-Image), [Diffusers](https://github.com/huggingface/diffusers) and [HuggingFace](https://huggingface.co)
 
+## ⭐ Star History
 
-
-
+[![Star History Chart](https://api.star-history.com/svg?repos=FireRedTeam/FireRed-Image-Edit&type=date&legend=top-left)](https://www.star-history.com/#FireRedTeam/FireRed-Image-Edit&type=date&legend=top-left)
