@@ -359,7 +359,7 @@ The REDEdit-Bench dataset will be available soon.
         <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><u>8.134</u></td>
         <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><u>7.819</u></td>
       </tr><tr>
-        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: left; white-space: nowrap;"><strong>\methodname</strong></td>
+        <td style="padding: 8px; border: 1px solid #d0d7de; text-align: left; white-space: nowrap;"><strong>FireRed-Image-Edit</strong></td>
         <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>8.363</strong></td>
         <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>8.245</strong></td>
         <td style="padding: 8px; border: 1px solid #d0d7de; text-align: center; white-space: nowrap;"><strong>7.943</strong></td>
