@@ -1,13 +1,16 @@
 <p align="center">
     <img src="./assets/logo.png" width="600"/>
 <p> 
- <p align="center">
-    <a href="https://huggingface.co/FireRedTeam" target="_blank"><img alt="Hugging Face" src="https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-FireRedTeam-ffc107?color=ffc107&logoColor=white" style="display: inline-block;"/></a>
-    <a href='https://github.com/FireRedTeam/FireRed-Image-Edit'><img src='https://img.shields.io/badge/GitHub-Code-black'></a>
-    <a href='https://www.apache.org/licenses/LICENSE-2.0'><img src="https://img.shields.io/badge/license-Apache%202.0-blue" alt="License"></a>
-    <a href="https://github.com/FireRedTeam/FireRed-Image-Edit/blob/main/assets/FireRed_Image_Edit_1_0_Techinical_Report.pdf" target="_blank"><img src="https://img.shields.io/badge/Report-b5212f.svg?logo=arxiv"></a>
-  </p>
-<p align="center"> 
+<p align="center">
+  <a href="https://huggingface.co/FireRedTeam" target="_blank"><img alt="Hugging Face" src="https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-FireRedTeam-ffc107?color=ffc107&logoColor=white" style="display: inline-block;"/></a>
+  <a href="https://huggingface.co/FireRedTeam/FireRed-Image-Edit-1.0" target="_blank"><img alt="Hugging Face Model" src="https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-FireRed--Image--Edit--1.0-red" style="display: inline-block;"/></a>
+  <a href="https://huggingface.co/spaces/FireRedTeam/FireRed-Image-Edit-1.0" target="_blank"><img alt="Demo" src="https://img.shields.io/badge/%F0%9F%92%BB%20Demo-FireRed--Image--Edit--1.0-red" style="display: inline-block;"/></a>
+  <a href='https://github.com/FireRedTeam/FireRed-Image-Edit'><img src='https://img.shields.io/badge/GitHub-Code-black'></a>
+  <a href='https://www.apache.org/licenses/LICENSE-2.0'><img src="https://img.shields.io/badge/license-Apache%202.0-blue" alt="License"></a>
+  <a href="https://github.com/FireRedTeam/FireRed-Image-Edit/blob/main/assets/FireRed_Image_Edit_1_0_Techinical_Report.pdf" target="_blank"><img src="https://img.shields.io/badge/Report-b5212f.svg?logo=arxiv"></a>
+</p> 
+
+<p align="center">
     🤗 <a href="https://huggingface.co/FireRedTeam/FireRed-Image-Edit-1.0">HuggingFace</a> |
     🖥️ <a href="https://huggingface.co/spaces/FireRedTeam/FireRed-Image-Edit-1.0"> Demo</a> |
     📄 <a href="https://github.com/FireRedTeam/FireRed-Image-Edit/blob/main/assets/FireRed_Image_Edit_1_0_Techinical_Report.pdf">Technical Report</a>
@@ -29,7 +32,9 @@
 
 
 ## 📰 News
-- 2026.02.10: We released FireRed-Image-Edit-1.0. 
+- 2026.02.14: We released FireRed-Image-Edit-1.0 model weights. Check more details in the [Model Zoo](#-model-zoo) section.
+- 2026.02.10: We released the [Technical Report](https://github.com/FireRedTeam/FireRed-Image-Edit/blob/main/assets/FireRed_Image_Edit_1_0_Techinical_Report.pdf) of FireRed-Image-Edit-1.0. 
+
 ## 🎨 Showcase
 Some real outputs produced by FireRed-Image-Edit across genearl editing.
 <p align="center">
@@ -54,7 +59,7 @@ Some real outputs produced by FireRed-Image-Edit across genearl editing.
         <td style="white-space: nowrap; padding: 8px; border: 1px solid #d0d7de;">Image-Editing</td>
         <td style="padding: 8px; border: 1px solid #d0d7de;">General-purpose image editing model</td>
         <td style="padding: 8px; border: 1px solid #d0d7de;">
-          <span style="white-space: nowrap;">To be released</a></span>
+          <span style="white-space: nowrap;">🤗&nbsp;<a href="https://huggingface.co/FireRedTeam/FireRed-Image-Edit-1.0">HuggingFace</a></span>
         </td>
       </tr>
       <tr>
@@ -62,7 +67,7 @@ Some real outputs produced by FireRed-Image-Edit across genearl editing.
         <td style="white-space: nowrap; padding: 8px; border: 1px solid #d0d7de;">Image-Editing</td>
         <td style="padding: 8px; border: 1px solid #d0d7de;">Distilled version of FireRed-Image-Edit-1.0 for faster inference</td>
         <td style="padding: 8px; border: 1px solid #d0d7de;">
-          <span style="white-space: nowrap;">To be released</a></span>
+          <span style="white-space: nowrap;">To be released</span>
         </td>
       </tr>
       <tr>
@@ -70,7 +75,7 @@ Some real outputs produced by FireRed-Image-Edit across genearl editing.
         <td style="white-space: nowrap; padding: 8px; border: 1px solid #d0d7de;">Text-to-Image</td>
         <td style="padding: 8px; border: 1px solid #d0d7de;">High-quality text-to-image generation model</td>
         <td style="padding: 8px; border: 1px solid #d0d7de;">
-          <span style="white-space: nowrap;">To be released</a></span>
+          <span style="white-space: nowrap;">To be released</span>
         </td>
       </tr>
     </tbody>
@@ -766,7 +771,7 @@ The code and the weights of FireRed-Image-Edit are licensed under Apache 2.0.
 
 
 ## 📝 TODO:
-- [ ] Release FireRed-Image-Edit-1.0 model.
+- [x] Release FireRed-Image-Edit-1.0 model.
 - [ ] Release REDEdit-Bench, a comprehensive benchmark for image editing evaluation.
 - [ ] Release FireRed-Image-Edit-1.0-Distilled model, a distilled version of FireRed-Image-Edit-1.0 for few-step generation.
 - [ ] Release FireRed-Image model, a text-to-image generative model.
