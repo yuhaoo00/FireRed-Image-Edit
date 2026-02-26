@@ -833,6 +833,23 @@ FireRed-Image-Edit  has not been specifically designed or comprehensively evalua
 
 We would like to thank the developers of the amazing open-source projects, especially [Qwen-Image](https://github.com/QwenLM/Qwen-Image) for providing a powerful text-to-image foundation model, as well as [Diffusers](https://github.com/huggingface/diffusers) and [HuggingFace](https://huggingface.co).
 
+## ☎️ Contact
+
+Please contact us and join our WeChat Group or Xiaohongshu Group if you have any questions.
+
+#### &nbsp;&nbsp;&nbsp;&nbsp; WeChat Group &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Xiaohongshu Group 
+&nbsp;&nbsp;&nbsp;&nbsp;<img src=assets/wechat.png width="200px">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<img src=assets/xhs.png width="200px">
+
+
 ## ⭐ Star History
 
 [![Star History Chart](https://api.star-history.com/svg?repos=FireRedTeam/FireRed-Image-Edit&type=date&legend=top-left)](https://www.star-history.com/#FireRedTeam/FireRed-Image-Edit&type=date&legend=top-left)
+
+
+---
+
+<div align="center">
+  <sub>Built by 小红书智能创作基础技术团队 Xiaohongshu Intelligent Creation Core Technology Team</sub>
+</div>
