@@ -1,0 +1,6 @@
+torch
+Pillow
+diffusers
+accelerate
+google-generativeai
+tqdm
