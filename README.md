@@ -35,7 +35,7 @@
 
 
 ## 📰 News
-- 2026.02.27: We provided FireRed-Image-Edit-1.0-ComfyUI workflow. Check more details on [Huggingface](https://huggingface.co/FireRedTeam/FireRed-Image-Edit-1.0-ComfyUI)
+- 2026.02.27: We released the [Agent](#-agent-multi-image-preprocessing) module for instruction rewriting, multi-image preprocessing, supporting automatic ROI detection, image stitching for editing with more than 3 images.
 - 2026.02.14: We released FireRed-Image-Edit-1.0 model weights. Check more details on [Huggingface](https://huggingface.co/FireRedTeam/FireRed-Image-Edit-1.0) and [ModelScope](https://modelscope.cn/models/FireRedTeam/FireRed-Image-Edit-1.0).
 - 2026.02.10: We released the [Technical Report](https://arxiv.org/abs/2602.13344) of FireRed-Image-Edit-1.0. 
 
@@ -119,10 +119,11 @@ Some real outputs produced by FireRed-Image-Edit across general editing.
 
 ## ⚡️ Quick Start
 
-1. Install the latest version of diffusers
+1. Install dependencies
+```bash
+pip install -r requirements.txt
 ```
-pip install git+https://github.com/huggingface/diffusers
-```
+
 2. Use the following code snippets to generate or edit images.
 ```
 python inference.py \
@@ -130,6 +131,36 @@ python inference.py \
     --prompt "在书本封面Python的下方，添加一行英文文字2nd Edition" \
     --output_image output_edit.png \
     --seed 43
+```
+
+## 🤖 Agent: Recaption & Multi-Image Preprocessing
+
+FireRed-Image-Edit natively supports **1–3** input images. When users need to edit with **more than 3 images**, the built-in **Agent** module automatically:
+
+1. **ROI Detection** – Sends all images + the user instruction to a Gemini function-calling model that returns a bounding-box for the most relevant region in each image.
+2. **Crop & Stitch** – Crops each image to its ROI, then partitions and stitches them into **2–3 composite images** (≈1024×1024 each) while minimising whitespace and preserving content at maximum resolution.
+3. **Recaption** – Rewrites the user instruction so that image references (图1/图2/image N …) correctly point to the new composite images, and expands the prompt to ~512 words/characters for richer editing context. The user's original language is preserved.
+
+
+**(Optional)** To enable the **Recaption** feature (rewriting instructions via Gemini for better editing results), set your Gemini API key:
+
+```bash
+export GEMINI_API_KEY="your-gemini-api-key"
+```
+
+> **Note:** The Gemini API is **not required**. Without it, the Agent will still perform ROI detection and image stitching normally, but will skip the instruction rewriting step. Setting a Gemini API key is recommended for best results.
+
+
+### Agent File Structure
+
+```
+agent/
+├── __init__.py        # Package entry – exports AgentPipeline
+├── config.py          # Configuration (API keys, stitch parameters, etc.)
+├── gemini_agent.py    # Gemini function-calling for ROI detection
+├── image_tools.py     # Image tools: crop, resize, stitch, partition
+├── recaption.py       # Instruction rewriting & expansion via Gemini
+└── pipeline.py        # End-to-end orchestration pipeline
 ```
 
 ## 📊 Benchmark
