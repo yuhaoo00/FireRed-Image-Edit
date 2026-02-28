@@ -63,7 +63,7 @@ torchrun --nproc_per_node=$GPUS_PER_NODE --nnodes $NNODES --node_rank $NODE_RANK
 | `--disable_inverse` | 禁用逆向提示词 | - |
 | `--t2i_mode` | T2I 模式（文生图） | - |
 
-多机时设置 `WORLD_SIZE`、`RANK`、`MASTER_ADDR`、`MASTER_PORT` 后，用 `torchrun` 的 `--nnodes`、`--node_rank` 等启动即可。更多示例见 `examples/extract_vlm_embeds.sh`。
+多机时设置环境变量 `WORLD_SIZE`、`RANK`、`MASTER_ADDR`、`MASTER_PORT` 后，用 `torchrun` 的 `--nnodes`、`--node_rank` 等启动即可。更多示例见 `examples/extract_vlm_embeds.sh`。
 
 ---
 
@@ -126,7 +126,7 @@ accelerate launch --mixed_precision="bf16" --use_fsdp \
 | `--train_data_weights` | 各 task 采样权重，格式：`task1=w1,task2=w2`，未列出的 task 不参与训练 |
 | `--train_src_img_num_weights` | 按「源图数量」加权，格式：`0=w0,1=w1,2=w2,3=w3`（0/1/2/3 张源图） |
 
-按需调整 `train_data_weights` 中的数据集名称与权重即可实现自己的多数据集混合训练。更多示例见 `examples/train.sh`。
+按需调整 `train_data_weights` 中的数据集名称与权重即可实现自己的多数据集混合训练。多机训练时需配置环境变量 `WORLD_SIZE`、`RANK`、`MASTER_ADDR`、`MASTER_PORT`，更多示例见 `examples/train.sh`。
 
 ---
 
@@ -135,23 +135,3 @@ accelerate launch --mixed_precision="bf16" --use_fsdp \
 - Python 3.12
 - PyTorch、Transformers、Accelerate、Diffusers 等（见项目 `requirements` 或环境配置）
 
-
----
-
-## 目录结构示例
-
-```
-post-trainers/
-├── README.md
-├── src/
-│   ├── extract_vlm_embeds.py   # 第一步：离线抽取 VLM embeddings
-│   ├── sft.py                  # 第二步：SFT 训练入口
-│   ├── arguments.py
-│   ├── data_provider.py
-│   └── ...
-└── examples/
-    ├── extract_vlm_embeds.sh   # 抽取示例
-    └── train.sh                # 训练示例
-```
-
-第一步对每个 JSONL 输出一个 task 目录（内含 jsonl + embeddings），将这些 task 目录统一放到同一个 `train_data_meta_dir` 下，在第二步中通过 `train_data_weights` 指定权重即可混合训练。
